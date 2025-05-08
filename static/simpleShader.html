@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simpleShader</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2a5885;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .shader-container {
+            width: 100%;
+            height: 400px;
+            margin: 30px 0;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        .code-block {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: #e06c75;
+        }
+
+        .keyword {
+            color: #c678dd;
+        }
+
+        .comment {
+            color: #98c379;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="shader-container" id="shader-container"></div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="amplitude">Wave Amplitude</label>
+                <input type="range" id="amplitude" min="0" max="1" step="0.01" value="0.3">
+            </div>
+            <div class="control-group">
+                <label for="frequency">Wave Frequency</label>
+                <input type="range" id="frequency" min="1" max="20" step="0.5" value="5">
+            </div>
+            <div class="control-group">
+                <label for="speed">Animation Speed</label>
+                <input type="range" id="speed" min="0.1" max="3" step="0.1" value="1">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Initialize the Three.js scene
+        const container = document.getElementById('shader-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 10);
+        camera.position.z = 1;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        // Define the shader parameters
+        const uniforms = {
+            time: { value: 0 },
+            amplitude: { value: 0.3 },
+            frequency: { value: 5.0 },
+            colorA: { value: new THREE.Color(0x0077ff) },
+            colorB: { value: new THREE.Color(0x00ffaa) }
+        };
+
+        // Create vertex shader
+        const vertexShader = `
+      uniform float time;
+      uniform float amplitude;
+      uniform float frequency;
+      
+      varying vec2 vUv;
+      varying float vElevation;
+      
+      void main() {
+        vUv = uv;
+        
+        // Create wave effect
+        vec3 pos = position;
+        float elevation = sin(pos.x * frequency + time) * amplitude;
+        elevation += sin(pos.y * frequency * 0.8 + time * 0.7) * amplitude;
+        pos.z += elevation;
+        
+        vElevation = elevation;
+        
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+      }
+    `;
+
+        // Create fragment shader
+        const fragmentShader = `
+      uniform vec3 colorA;
+      uniform vec3 colorB;
+      
+      varying vec2 vUv;
+      varying float vElevation;
+      
+      void main() {
+        float mixFactor = (vElevation * 2.0 + 0.5);
+        vec3 color = mix(colorA, colorB, mixFactor);
+        
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+        // Create a plane with the shader material
+        const geometry = new THREE.PlaneGeometry(2, 2, 150, 150);
+        const material = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            wireframe: false
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Set up UI controls
+        const amplitudeControl = document.getElementById('amplitude');
+        const frequencyControl = document.getElementById('frequency');
+        const speedControl = document.getElementById('speed');
+
+        let speed = 1.0;
+
+        amplitudeControl.addEventListener('input', (e) => {
+            uniforms.amplitude.value = parseFloat(e.target.value);
+        });
+
+        frequencyControl.addEventListener('input', (e) => {
+            uniforms.frequency.value = parseFloat(e.target.value);
+        });
+
+        speedControl.addEventListener('input', (e) => {
+            speed = parseFloat(e.target.value);
+        });
+
+        // Animation loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            uniforms.time.value += delta * speed;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SVG Animation</title>
+</head>
+<body>
+    <script type="module">
+        import { SVG } from 'https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js/+esm';
+        const draw = SVG().addTo('body').size(400, 400);
+        const circle = draw.circle(100).fill('#00ccff').center(250, 250);
+        let startTime = performance.now();
+        function animate(time) {
+            const elapsed = (time - startTime) / 1000;
+            const scale = 0.5 + 0.5 * Math.sin(elapsed * 2 * Math.PI * 0.5);
+            const radius = 50 + scale * 100;
+            circle.radius(radius);
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
