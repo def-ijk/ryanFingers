@@ -97,9 +97,13 @@ for (let i = 1; i <= numRings; i++) {
 </script>
 
 
-# The Flood by Yoshi Sodeoka
+# The Flood by Yoshi Sodeoka 
 
-<video src="/assets/theFlood.mp4" playsinline autoplay muted loop>
+<p>
+  <video src="/theFlood.mp4" playsinline autoplay muted loop></video>
+</p>
+<p>
+  This work esxpressed simulation that justapose the organic behavioural patterns of spiders with inorganic nature of algorithmic animation. It seems like each generative spider is customized with unique parameters. Also, the generated videos fluctuate between ballets and battles.
+</p>
 
-</video>
 
