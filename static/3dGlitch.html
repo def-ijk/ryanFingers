@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3dGlitch</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: monospace;
+            background-color: #000;
+            color: #fff;
+        }
+        canvas {
+            display: block;
+        }
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.7;
+        }
+        .quote-container {
+            position: absolute;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            font-size: 16px;
+            line-height: 1.5;
+            opacity: 0;
+            transition: opacity 2s ease;
+            pointer-events: none;
+        }
+        #quote1 {
+            top: 10%;
+            left: 5%;
+        }
+        #quote2 {
+            bottom: 10%;
+            right: 5%;
+        }
+        #quote3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+        }
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+   
+    
+    <div class="info">
+        CLICK to experience the glitch<br>
+        Inspired by Michel Serres' "Information & Thinking"
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Setting up the scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        
+        // Global variables
+        let time = 0;
+        let noiseLevel = 0.5;
+        let showRelations = true;
+        // let currentQuote = 1;
+        let glitchIntensity = 0.0;
+        let mouseX = 0, mouseY = 0;
+        let particles = [];
+        let relations = [];
+        let isGlitching = false;
+        
+        // Create information particles
+        const particleGeometry = new THREE.SphereGeometry(0.15, 8, 8);
+        const particleMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8
+        });
+        
+        // Generate particles
+        for (let i = 0; i < 100; i++) {
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial.clone());
+            particle.position.set(
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 20
+            );
+            particle.userData = {
+                basePosition: particle.position.clone(),
+                speed: Math.random() * 0.02 + 0.005,
+                phase: Math.random() * Math.PI * 2,
+                size: Math.random() * 0.2 + 0.1
+            };
+            particles.push(particle);
+            scene.add(particle);
+        }
+        
+        // Create relation lines
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0.2
+        });
+        
+        // Generate relations between particles
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                if (Math.random() > 0.95) {  // Only create some relations
+                    const geometry = new THREE.BufferGeometry();
+                    const line = new THREE.Line(geometry, lineMaterial.clone());
+                    relations.push({
+                        line: line,
+                        from: i,
+                        to: j
+                    });
+                    scene.add(line);
+                }
+            }
+        }
+        
+        // Noise/glitch effect
+        const noiseGeometry = new THREE.PlaneGeometry(40, 40, 32, 32);
+        const noiseMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.1
+        });
+        const noiseMesh = new THREE.Mesh(noiseGeometry, noiseMaterial);
+        scene.add(noiseMesh);
+        
+        // Position the camera
+        camera.position.z = 15;
+        
+        // Mouse movement tracking
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+        
+        // Click for glitch effect
+        document.addEventListener('click', () => {
+            triggerGlitch();
+        });
+        
+        // Cycle through quotes with spacebar
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                cycleQuotes();
+            }
+        });
+        
+        
+        function triggerGlitch() {
+            isGlitching = true;
+            glitchIntensity = 1.0;
+            
+            // Scramble positions
+            particles.forEach(particle => {
+                particle.position.add(new THREE.Vector3(
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2
+                ));
+            });
+            
+            // Return to normal after glitch
+            setTimeout(() => {
+                isGlitching = false;
+            }, 1000);
+        }
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+            
+            // Decay glitch intensity
+            if (!isGlitching && glitchIntensity > 0) {
+                glitchIntensity *= 0.95;
+            }
+            
+            // Update particles
+            particles.forEach((particle, index) => {
+                const { basePosition, speed, phase, size } = particle.userData;
+                
+                // Calculate new position with noise
+                const noiseOffset = Math.sin(time * speed + phase) * noiseLevel;
+                const mouseInfluence = 0.1;
+                
+                particle.position.x = basePosition.x + noiseOffset + mouseX * mouseInfluence * 5;
+                particle.position.y = basePosition.y + noiseOffset + mouseY * mouseInfluence * 5;
+                particle.position.z = basePosition.z + noiseOffset;
+                
+                // Add glitch effect
+                if (glitchIntensity > 0.01) {
+                    particle.position.add(new THREE.Vector3(
+                        (Math.random() - 0.5) * glitchIntensity,
+                        (Math.random() - 0.5) * glitchIntensity,
+                        (Math.random() - 0.5) * glitchIntensity
+                    ));
+                }
+                
+                // Update size based on noise
+                particle.scale.set(
+                    size + noiseOffset * 0.5,
+                    size + noiseOffset * 0.5,
+                    size + noiseOffset * 0.5
+                );
+                
+                // Update colors based on position
+                const hue = (basePosition.x + 10) / 20; // Normalize to 0-1
+                particle.material.color.setHSL(hue, 0.7, 0.5 + noiseOffset * 0.2);
+                particle.material.opacity = 0.8 - noiseOffset * 0.3;
+            });
+            
+            // Update relations (lines between particles)
+            relations.forEach(relation => {
+                const from = particles[relation.from].position;
+                const to = particles[relation.to].position;
+                
+                // Calculate distance
+                const distance = from.distanceTo(to);
+                
+                // Only show relations within a certain distance
+                relation.line.visible = showRelations && distance < 5;
+                
+                // Update line geometry
+                const points = [from, to];
+                relation.line.geometry.dispose();
+                relation.line.geometry = new THREE.BufferGeometry().setFromPoints(points);
+                
+                // Color based on distance
+                const intensity = 1 - distance / 5;
+                relation.line.material.opacity = intensity * 0.3;
+            });
+            
+            // Update noise mesh
+            const noiseVertices = noiseGeometry.attributes.position.array;
+            for (let i = 0; i < noiseVertices.length; i += 3) {
+                const x = noiseVertices[i];
+                const y = noiseVertices[i + 1];
+                const z = Math.sin(x * 0.1 + time) * Math.cos(y * 0.1 + time) * 2 * noiseLevel;
+                noiseVertices[i + 2] = z + (Math.random() - 0.5) * glitchIntensity;
+            }
+            noiseGeometry.attributes.position.needsUpdate = true;
+            noiseMesh.rotation.x = time * 0.1;
+            noiseMesh.rotation.y = time * 0.15;
+            
+            // Rotate camera slightly based on mouse
+            camera.position.x = Math.sin(mouseX * Math.PI) * 5;
+            camera.position.y = Math.sin(mouseY * Math.PI) * 5;
+            camera.lookAt(scene.position);
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>

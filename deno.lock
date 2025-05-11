@@ -1,5 +1,5 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
     "jsr:@deno/gfm@*": "0.10.0",
     "jsr:@denosaurs/emoji@0.3": "0.3.1",
@@ -71,7 +71,8 @@
         "picocolors",
         "postcss@8.4.35",
         "postcss-value-parser"
-      ]
+      ],
+      "bin": true
     },
     "boolbase@1.0.0": {
       "integrity": "sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww=="
@@ -83,7 +84,8 @@
         "electron-to-chromium",
         "node-releases",
         "update-browserslist-db"
-      ]
+      ],
+      "bin": true
     },
     "caniuse-api@3.0.0": {
       "integrity": "sha512-bsTwuIg/BZZK/vreVTYYbSWoe2F+71P7K5QGEX+pT250DZbfU1MQ5prOKpPR+LL6uWKK3KMwMCAS74QB3Um1uw==",
@@ -140,7 +142,8 @@
       "integrity": "sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw=="
     },
     "cssesc@3.0.0": {
-      "integrity": "sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg=="
+      "integrity": "sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==",
+      "bin": true
     },
     "cssnano-preset-default@6.1.2_postcss@8.4.35": {
       "integrity": "sha512-1C0C+eNaeN8OcHQa193aRgYexyJtU8XwbdieEjClw+J9d94E41LwT6ivKH0WT+fYwYWB0Zp3I3IZ7tI/BbUbrg==",
@@ -245,7 +248,8 @@
       "integrity": "sha512-IaOQ9puYtjrkq7Y0Ygl9KDZnrf/aiUJYUpVf89y8kyaxbRG7Y1SrX/jaumrv81vc61+kiMempujsM3Yw7w5qcw=="
     },
     "he@1.2.0": {
-      "integrity": "sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw=="
+      "integrity": "sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==",
+      "bin": true
     },
     "htmlparser2@8.0.2": {
       "integrity": "sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==",
@@ -263,7 +267,8 @@
       "integrity": "sha512-XvqR7FgOHtWupfMiigNzmh+MgUVmDGU2kXZm899ZkPfcuoPuFxyHmXsgATDpFZDAXCI8tvinaVcDo8PIIJSo4A==",
       "dependencies": [
         "commander@8.3.0"
-      ]
+      ],
+      "bin": true
     },
     "lilconfig@3.1.3": {
       "integrity": "sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw=="
@@ -294,7 +299,8 @@
       ]
     },
     "marked@12.0.2": {
-      "integrity": "sha512-qXUm7e/YKFoqFPYPa3Ukg9xlI5cyAtGmyEIzMfW//m6kXwCy2Ps9DYf5ioijFKQ8qyuscrHoY04iJGctu2Kg0Q=="
+      "integrity": "sha512-qXUm7e/YKFoqFPYPa3Ukg9xlI5cyAtGmyEIzMfW//m6kXwCy2Ps9DYf5ioijFKQ8qyuscrHoY04iJGctu2Kg0Q==",
+      "bin": true
     },
     "mdn-data@2.0.28": {
       "integrity": "sha512-aylIc7Z9y4yzHYAJNuESG3hfhC+0Ibp/MAMiaOZgNv4pmEdFyfZhhhny4MNiAfWdBQ1RQ2mfDWmM1x8SvGyp8g=="
@@ -303,7 +309,8 @@
       "integrity": "sha512-GaqWWShW4kv/G9IEucWScBx9G1/vsFZZJUO+tD26M8J8z3Kw5RDQjaoZe03YAClgeS/SWPOcb4nkFBTEi5DUEA=="
     },
     "nanoid@3.3.11": {
-      "integrity": "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w=="
+      "integrity": "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==",
+      "bin": true
     },
     "node-releases@2.0.19": {
       "integrity": "sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw=="
@@ -585,7 +592,8 @@
         "css-what",
         "csso",
         "picocolors"
-      ]
+      ],
+      "bin": true
     },
     "update-browserslist-db@1.1.2_browserslist@4.24.4": {
       "integrity": "sha512-PPypAm5qvlD7XMZC3BujecnaOxwhrtoFR+Dqkk5Aa/6DssiH0ibKoketaj9w8LP7Bont1rYeoV5plxD7RTEPRg==",
@@ -593,7 +601,8 @@
         "browserslist",
         "escalade",
         "picocolors"
-      ]
+      ],
+      "bin": true
     },
     "util-deprecate@1.0.2": {
       "integrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw=="
@@ -601,6 +610,8 @@
   },
   "redirects": {
     "https://esm.sh/@types/babel__helper-validator-identifier@~7.15.2/index.d.ts": "https://esm.sh/@types/babel__helper-validator-identifier@7.15.2/index.d.ts",
+    "https://esm.sh/@types/react@~18.2.79/index.d.ts": "https://esm.sh/@types/react@18.2.79/index.d.ts",
+    "https://esm.sh/@types/three@~0.150.2/index.d.ts": "https://esm.sh/@types/three@0.150.2/index.d.ts",
     "https://esm.sh/sax@^1.2.4?target=denonext": "https://esm.sh/sax@1.4.1?target=denonext",
     "https://esm.sh/style-vendorizer@^2.0.0?target=denonext": "https://esm.sh/style-vendorizer@2.2.3?target=denonext",
     "https://esm.sh/xml-js@^1.6.11?target=denonext": "https://esm.sh/xml-js@1.6.11?target=denonext"
@@ -1011,10 +1022,14 @@
     "https://esm.sh/preact@10.10.6/denonext/preact.mjs": "faed151e239af5a78b535bbef420f14da067eee75418f2dff3443d7649e879e5",
     "https://esm.sh/preact@10.10.6/hooks": "b23d94f310037e83656d9fbffce564c9af398ac3020be1e2b404ca98ddfb72e5",
     "https://esm.sh/preact@10.10.6/jsx-runtime": "2463127d183ef10113aa4de19dd6eca1a60d7a91d226cad7581f2485589c6e05",
+    "https://esm.sh/react@18.2.0": "fed8aeb7d240bb42a2167c9c7c6e842e128c7630cbcb08c4d61c9c1926f89c75",
+    "https://esm.sh/react@18.2.0/denonext/react.mjs": "a986c2876dc2f73879f395e677dc34cb751f260e69db16364810655f884df173",
     "https://esm.sh/sax@1.4.1/denonext/sax.mjs": "f6b76bfda979cf50ea49b0f4c36fdba9ac24c2f5261e31df0adb662f505ef277",
     "https://esm.sh/sax@1.4.1?target=denonext": "e27842cb4e8dc59720f1f3df21075f69ddeb0b5c06bb055efcd72d1d59fefd79",
     "https://esm.sh/style-vendorizer@2.2.3/denonext/style-vendorizer.mjs": "5201bd4a17899690af07a1f1d1de8504fb6ed401e3bd7fca4ce76598c2b3f4e6",
     "https://esm.sh/style-vendorizer@2.2.3?target=denonext": "046aa4bfbc2f2f1d624d74bde1b7d2227a5d9a00122725b711768554999fc3eb",
+    "https://esm.sh/three@0.150.1": "16864c4d4113c7c2503f1553a024cc4822d41f3dfd42d8f918604704ef961ed1",
+    "https://esm.sh/three@0.150.1/denonext/three.mjs": "cab87a3528c9251ff0316f5f1d634cea0b76ffca40bdf7ed70edb297142f398e",
     "https://esm.sh/twind@0.16.17": "1e05db280ad2f2bf1fea0f3ad6c5e0cf9fae0d10775aabb36bfd2254fce69bdb",
     "https://esm.sh/twind@0.16.17/denonext/sheets.mjs": "fb0bf7d7df78c67954130f7c5229779f7171dafc9ccfe4029cd586e4e5dfd78d",
     "https://esm.sh/twind@0.16.17/denonext/twind.mjs": "197ba8db7ec1e541cd6be404b71f770abd7ebfdbcbf04bf02c2e4c1e3fd067a8",

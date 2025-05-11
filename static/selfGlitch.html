@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glitchy Glitchy Glitch</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: monospace;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    #drop-zone {
+      border: 3px dashed rgb(253, 88, 5);
+      padding: 2rem;
+      width: 80%;
+      margin: auto;
+      max-width: 400px;
+      color: #ccc;
+      font-size: 1.2rem;
+      transition: background 0.3s;
+      border-radius: 10px;
+    }
+
+    #drop-zone.dragover {
+      background: rgba(255, 0, 255, 0.1);
+      color: white;
+    }
+
+    canvas {
+      margin-top: 2rem;
+      box-shadow: 0 0 30px rgb(0, 21, 255);
+      image-rendering: pixelated;
+      max-width: 100%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Glitchy Glitchy Glitch</h1>
+  <div id="drop-zone">Drag and drop your image here to experience yourself with glitch👾</div>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    let originalImage = null;
+    let glitchInterval = null;
+
+    // Handle drag-over effect
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    // Handle file drop
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        loadImageFromFile(file);
+      }
+    });
+
+    function loadImageFromFile(file) {
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        if (glitchInterval) clearInterval(glitchInterval);
+        glitchInterval = setInterval(() => {
+          ctx.putImageData(glitchFrame(originalImage), 0, 0);
+        }, 100);
+      };
+      img.src = URL.createObjectURL(file);
+    }
+
+    function glitchFrame(imageData) {
+      const data = new Uint8ClampedArray(imageData.data);
+      const width = canvas.width;
+      const height = canvas.height;
+
+      for (let i = 0; i < 25; i++) {
+        const y = Math.floor(Math.random() * height);
+        const offset = Math.floor((Math.random() - 0.5) * 80); // more shift
+
+        const start = y * width * 4;
+        const end = start + width * 4;
+        const line = data.slice(start, end);
+        const glitchedLine = new Uint8ClampedArray(width * 4);
+
+        for (let x = 0; x < width; x++) {
+          const srcIndex = x * 4;
+          const destIndex = ((x + offset + width) % width) * 4;
+
+          // RGB swap
+          glitchedLine[destIndex] = line[srcIndex + 2];     // R <- B
+          glitchedLine[destIndex + 1] = line[srcIndex];     // G <- R
+          glitchedLine[destIndex + 2] = line[srcIndex + 1]; // B <- G
+          glitchedLine[destIndex + 3] = 255;
+        }
+
+        data.set(glitchedLine, start);
+      }
+
+      return new ImageData(data, width, height);
+    }
+  </script>
+</body>
+</html>
