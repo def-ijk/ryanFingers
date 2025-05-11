@@ -14,7 +14,7 @@ allow_math: true
 
 # Experimental Glitch
 
-<iframe src="/3dGlitch.html" width="800" height="580" frameborder="0"></iframe>
+<iframe src="/chaos.html" width="800" height="580" frameborder="0"></iframe>
 
 ## Quoted from "Information & Thinking" by Michel Serres
 **<em>"Information exists in nature; thinking is not unique to humans."</em>**
