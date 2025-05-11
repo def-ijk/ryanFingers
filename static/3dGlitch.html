@@ -70,6 +70,8 @@
 </head>
 <body>
    
+    <audio id="bg-audio" src="/bg-ambient.mp3" loop preload="auto"></audio>
+    <audio id="glitch-audio" src="/glitch.mp3" preload="auto"></audio>
     
     <div class="info">
         CLICK to experience the glitch<br>
@@ -95,6 +97,11 @@
         let particles = [];
         let relations = [];
         let isGlitching = false;
+        
+        // Audio elements
+        const bgAudio = document.getElementById('bg-audio');
+        const glitchAudio = document.getElementById('glitch-audio');
+        let audioStarted = false;
         
         // Create information particles
         const particleGeometry = new THREE.SphereGeometry(0.15, 8, 8);
@@ -177,10 +184,26 @@
             }
         });
         
+        // Start background audio on first interaction
+        function startAudio() {
+            if (!audioStarted) {
+                bgAudio.volume = 0.3; // softer background
+                bgAudio.play();
+                audioStarted = true;
+            }
+        }
+        document.addEventListener('click', startAudio, { once: true });
+        document.addEventListener('keydown', startAudio, { once: true });
         
+        // Play glitch sound in triggerGlitch
         function triggerGlitch() {
             isGlitching = true;
             glitchIntensity = 1.0;
+            
+            // Play glitch sound
+            glitchAudio.currentTime = 0;
+            glitchAudio.volume = 0.7;
+            glitchAudio.play();
             
             // Scramble positions
             particles.forEach(particle => {
