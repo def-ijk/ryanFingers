@@ -10,17 +10,14 @@ allow_math: true
 
 ## Why TouchDesigner?
 
-After exploring various graphical programming languages, I was drawn to TouchDesigner for several compelling reasons. As someone interested in the intersection of code, visuals, and interactivity, TouchDesigner stood out as a platform that could bridge my technical skills with creative expression.
-
 What initially caught my attention was TouchDesigner's versatility in creating interactive visuals, immersive experiences, and real-time data-driven projects. Unlike some visual programming environments that feel limiting or toy-like, TouchDesigner is used professionally for everything from concert visuals to museum installations to architectural projection mapping.
 
-The deciding factor was discovering that TouchDesigner operates through a node-based visual programming system where each building block, known as an Operator (OP), has a specific function. This modular approach resonated with how I think about creative coding – breaking complex ideas into manageable, interconnected pieces.
 
 ## My Learning Process
 
-I started by following several tutorial series, particularly the comprehensive guides from Steve Zafeiriou and the official Derivative tutorials. The learning curve was initially steep but rewarding. TouchDesigner's interface can be overwhelming at first – there are hundreds of operators divided into different families (CHOPs, TOPs, SOPs, DATs, and COMPs), each serving specific purposes.
+I started by following several tutorial series, particularly the comprehensive guides from [Steve Zafeiriou](https://stevezafeiriou.com/). The learning curve was initially steep but rewarding. TouchDesigner's interface can be overwhelming at first – there are hundreds of operators divided into different families (CHOPs, TOPs, SOPs, DATs, and COMPs), each serving specific purposes.
 
-The breakthrough moment came when I understood that TouchDesigner isn't just about connecting nodes – it's about creating living, breathing systems that respond to data, whether that's audio, video, sensor input, or real-time information from the internet.
+The breakthrough moment came when I understood that TouchDesigner isn't just about connecting nodes but it's also about creating living, breathing systems that respond to data, whether that's audio, video, sensor input, or real-time information from the internet.
 
 ### Key Concepts I Learned:
 
@@ -48,7 +45,7 @@ For my learning project, I created an audio-reactive particle flow system that d
 
 The patch visualizes how data flows through a TouchDesigner network – from audio input through analysis, into visual generation, and finally to output. Each node in the network has a specific purpose, and the connections between them define how information flows and transforms.
 
-![touchDesigner](/static/testing_td.png)
+<img src="/testing_td.png" alt="TouchDesigner patch visualization" />
 
 ## How I Might Use TouchDesigner in Creative Practice
 
@@ -124,13 +121,3 @@ After spending time with TouchDesigner, I've developed nuanced thoughts on the G
 4. **Screen Real Estate**: We need a lot of screen space to work effectively
 5. **Precision**: Sometimes exact numerical values or complex logic are easier to express in code
 
-
-## Conclusion
-
-Learning TouchDesigner has expanded my creative toolkit in meaningful ways. It's shown me that graphical programming languages aren't just "easier" alternatives to text-based coding – they're different tools that excel in different contexts.
-
-The visual, node-based approach of TouchDesigner aligns perfectly with creative workflows where experimentation, real-time feedback, and integration of multiple media types are paramount. While it has its limitations, particularly in terms of scalability and platform constraints, the ability to create professional-quality interactive visuals and installations makes it an invaluable tool.
-
-Moving forward, I see TouchDesigner not replacing my text-based coding practice but complementing it. For rapid prototyping of visual ideas, creating live performance tools, or building interactive installations, TouchDesigner offers a workflow that would be cumbersome to replicate in traditional code.
-
-The journey into graphical programming has reinforced my belief that the best creative technologists are those who can move fluidly between different tools and paradigms, choosing the right approach for each project. TouchDesigner has earned its place in my creative arsenal, and I'm excited to see where this visual programming journey takes me next.
