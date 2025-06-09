@@ -7,6 +7,8 @@ allow_math: true
 ---
 # Create GIF using Processing
 
+<img src="/processing_101.gif" alt="Testing on Processing.org" />
+
 ```js
 
 int numFrames = 120; 
