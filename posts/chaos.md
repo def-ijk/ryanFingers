@@ -1,6 +1,6 @@
 ---
 title: CHAOS!!!
-published_at: 2025-05-10
+published_at: 2025-05-05
 snippet: An example of a blog post.
 disable_html_sanitization: true
 allow_math: true
