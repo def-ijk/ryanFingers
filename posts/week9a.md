@@ -131,4 +131,9 @@ class Particle {
 }
 ```
 
-# 
+# Large Language Models
+For this exploration, I used LM Studio to run three different open-source LLMs locally, each from a different organization. I wanted to see how different models would approach the challenge of using code to engage communities of practice, specifically focusing on the mycelial creativity and digital garden themes from my AT3 project.
+
+This experiment revealed that different LLMs truly do have different personalities and strengths when it comes to creative problem-solving. 
+
+

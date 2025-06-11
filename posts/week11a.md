@@ -1,7 +1,7 @@
 ---
-title: Week 11A Assemble
+title: Week 11A Assembles
 published_at: 2025-05-23
-snippet: My CoPs
+snippet: AT3 Planning
 disable_html_sanitization: true
 allow_math: true
 ---
@@ -122,20 +122,6 @@ Underground we interweave
 Twenty-five, we bloom
 ```
 
-## Third Attempt (Philosophical)
-```
-Mycelium spreads
-Separate plants, connected roots
-We fruit together
-```
-
-## Fourth Attempt (Action-Oriented)
-```
-Plant. Connect below.
-Your flower strengthens us all.
-Bloom at twenty-five.
-```
-
 ## Final Version (Chosen)
 ```
 Roots glow gold beneath
@@ -153,14 +139,6 @@ This haiku captures:
 
 # Video Production Plan
 
-## Voiceover Script
-```
-[Soft, contemplative voice]
-
-Roots glow gold beneath...
-Each plant deepens our network...
-Together we bloom.
-```
 
 ## Video Structure
 1. Slow zoom into empty garden  
@@ -174,33 +152,12 @@ Suggested copyright-free tracks:
 - "Ethereal Relaxation" by Borrtex
 - "Garden Vibes" by Lukrembo
 
-## Blog Post Draft
 
 ### 🌸 Mycelial Garden: A Haiku Journey
 
 
-Sometimes the essence of a complex project can be distilled into just seventeen syllables. As I developed my AT3 project - the Mycelial Garden - I challenged myself to capture its spirit in haiku form.
-
-The process of reduction was illuminating. How do you compress:
-- Real-time collaborative technology
-- Underground network visualizations  
-- Community building mechanics
-- Ecological metaphors
-
-Into three brief lines?
-
-The answer came through focusing on the experiential rather than the technical. What does it *feel* like to participate in this garden? What do you *see*? What do you *become part of*?
 
 > Roots glow gold beneath  
 > Each plant deepens our network  
 > Together we bloom
 
-This haiku became my north star - every feature, every line of code, every aesthetic choice should serve this simple truth: we are connected beneath the surface, each action strengthens the whole, and our greatest beauty emerges collectively.
-
-The speed-modulated recording shows the garden's full lifecycle compressed into 20 seconds - the time it takes to speak these three lines. Watch how individual actions accumulate into collective achievement. Notice how the underground network grows more complex and beautiful with each addition.
-
-This is mycelial creativity in its purest form - not in the code or the visuals, but in the moment when separate becomes connected, when individuals become community, when planting becomes blooming.
-
-*What haiku would you write for your creative practice?*
-
----
