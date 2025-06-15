@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mycelial Garden - Growing Together</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98D8C8 100%);
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g transform="translate(20,20)"><ellipse cx="0" cy="2" rx="8" ry="4" fill="%23CD853F" opacity="0.9"/><ellipse cx="0" cy="2" rx="6" ry="3" fill="%23DEB887" opacity="0.9"/><rect x="-2" y="2" width="4" height="6" fill="%23FFF8DC" rx="1"/><circle cx="0" cy="1" r="1.5" fill="%23FFD700" opacity="0.8"/><circle cx="-3" cy="0" r="1" fill="%23FF69B4" opacity="0.7"/><circle cx="3" cy="0" r="1" fill="%23FF69B4" opacity="0.7"/><path d="M 0,-8 Q -2,-4 0,0 Q 2,-4 0,-8" fill="%2390EE90" opacity="0.8"/><circle cx="0" cy="-8" r="2" fill="%2332CD32" opacity="0.9"/></g></svg>') 20 20, auto;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            max-width: 300px;
+        }
+
+        #plant-counter {
+            font-size: 24px;
+            color: #2E7D32;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #network-strength {
+            font-size: 18px;
+            color: #5D4037;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        #instructions {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .mycelial-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-style: italic;
+        }
+
+        #plant-info {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 200;
+            max-width: 200px;
+            font-size: 14px;
+            color: #333;
+            pointer-events: none;
+        }
+
+        .connection-count {
+            font-size: 12px;
+            color: #5D4037;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        #blossom-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            transition: background 2s ease;
+        }
+
+        #blossom-message {
+            text-align: center;
+            color: white;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #blossom-message h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #blossom-message p {
+            font-size: 24px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .blossom-svg {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            opacity: 0;
+            animation: bloom 4s ease-in-out;
+        }
+
+        @keyframes bloom {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        #audio-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="translate(16,16)"><circle cx="0" cy="0" r="12" fill="%23FFE4B5" opacity="0.9"/><circle cx="-4" cy="-2" r="2" fill="%23000"/><circle cx="4" cy="-2" r="2" fill="%23000"/><path d="M -6,4 Q 0,8 6,4" fill="none" stroke="%23000" stroke-width="2" stroke-linecap="round"/><circle cx="-8" cy="-4" r="3" fill="%23FFB6C1" opacity="0.7"/><circle cx="8" cy="-4" r="3" fill="%23FFB6C1" opacity="0.7"/></g></svg>') 16 16, pointer;
+            font-size: 16px;
+            z-index: 100;
+            transition: transform 0.2s;
+        }
+
+        #audio-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        #mycelial-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 150px;
+            background: rgba(255, 215, 0, 0.9);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="translate(16,16)"><circle cx="0" cy="0" r="12" fill="%23FFE4B5" opacity="0.9"/><circle cx="-4" cy="-2" r="2" fill="%23000"/><circle cx="4" cy="-2" r="2" fill="%23000"/><path d="M -6,4 Q 0,8 6,4" fill="none" stroke="%23000" stroke-width="2" stroke-linecap="round"/><circle cx="-8" cy="-4" r="3" fill="%23FFB6C1" opacity="0.7"/><circle cx="8" cy="-4" r="3" fill="%23FFB6C1" opacity="0.7"/></g></svg>') 16 16, pointer;
+            font-size: 16px;
+            z-index: 100;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        #mycelial-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+        }
+
+        #mycelial-toggle.active {
+            background: rgba(255, 140, 0, 0.9);
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="info-panel">
+        <div id="plant-counter">🌱 Plants: 0 / 25</div>
+        <div id="network-strength">🍄 Network Strength: 0%</div>
+        <div id="instructions">
+            Click anywhere on the ground to plant!<br>
+            Hover over plants to see who planted them.<br>
+            Watch the mycelial network grow! 🌻
+        </div>
+        <div class="mycelial-info">
+            Like mycelium in nature, each plant connects to others, sharing resources and creating a resilient network of creativity.
+        </div>
+    </div>
+    
+    <div id="plant-info"></div>
+    
+    <div id="blossom-overlay">
+        <div id="blossom-message">
+            <h1>🌸 Network Complete! 🌸</h1>
+            <p></p>
+        </div>
+    </div>
+    
+    <button id="mycelial-toggle" class="active">🍄 Mycelium: ON</button>
+    <button id="audio-toggle">🎵 Music: ON</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Garden state
+        let plantCount = 0;
+        const maxPlants = 25;
+        const plants = [];
+        let audioEnabled = true;
+        let showMycelium = true;
+        const mycelialConnections = [];
+        const sporeParticles = [];
+        let networkPulse = 0;
+        
+        // Encouraging messages with mycelial themes
+        const messages = [
+            "Like mycelium, we've woven a network of hope! Each connection strengthens us all. 🍄",
+            "Together we form a creative ecosystem! Your contribution ripples through the entire network. 🌿",
+            "The mycelial mind emerges from our collective planting. We are stronger together! 🌍",
+            "Each plant is a node in our network of care. Thank you for growing this web of life! 🕸️",
+            "From underground connections bloom overground beauty. Keep nurturing our network! 💚",
+            "We've created a resilient garden through interconnection. The network remembers and grows! 🌸"
+        ];
+
+        // Plant types with emojis
+        const plantTypes = [
+            { emoji: '🌻', name: 'Sunflower', color: 0xFFD700 },
+            { emoji: '🌹', name: 'Rose', color: 0xFF69B4 },
+            { emoji: '🌷', name: 'Tulip', color: 0xFF6347 },
+            { emoji: '🌸', name: 'Cherry Blossom', color: 0xFFB6C1 },
+            { emoji: '🌺', name: 'Hibiscus', color: 0xFF1493 },
+            { emoji: '🌼', name: 'Daisy', color: 0xFFFFFF }
+        ];
+
+        // Names for simulated planters
+        const planterNames = [
+            "Emma", "Oliver", "Sophia", "William", "Ava", "James", "Isabella", "Benjamin",
+            "Mia", "Lucas", "Harper", "Mason", "Evelyn", "Ethan", "Abigail", "Alexander"
+        ];
+
+        // Three.js setup
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0x87CEEB, 10, 100);
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 15, 25);
+        camera.lookAt(0, 0, 0);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(10, 20, 5);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.camera.left = -20;
+        directionalLight.shadow.camera.right = 20;
+        directionalLight.shadow.camera.top = 20;
+        directionalLight.shadow.camera.bottom = -20;
+        scene.add(directionalLight);
+        
+        // Add point light for mycelium glow
+        const myceliumLight = new THREE.PointLight(0xFFD700, 0.5, 50);
+        myceliumLight.position.set(0, -2, 0);
+        scene.add(myceliumLight);
+        
+        // Ground with layers
+        const groundGeometry = new THREE.CircleGeometry(20, 32);
+        const groundMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0x7CB342,
+            side: THREE.DoubleSide
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Underground layer for mycelium with glow
+        const undergroundGeometry = new THREE.CircleGeometry(20, 64);
+        const undergroundMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x8B4513,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.DoubleSide
+        });
+        const underground = new THREE.Mesh(undergroundGeometry, undergroundMaterial);
+        underground.rotation.x = -Math.PI / 2;
+        underground.position.y = -0.5;
+        scene.add(underground);
+        
+        // Glowing underground network base
+        const networkBaseGeometry = new THREE.CircleGeometry(22, 64);
+        const networkBaseMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0xFFD700,
+            transparent: true,
+            opacity: 0.2,
+            side: THREE.DoubleSide
+        });
+        const networkBase = new THREE.Mesh(networkBaseGeometry, networkBaseMaterial);
+        networkBase.rotation.x = -Math.PI / 2;
+        networkBase.position.y = -0.6;
+        scene.add(networkBase);
+        
+        // Add some decorative mushrooms
+        function createMushroom(x, z) {
+            const mushroomGroup = new THREE.Group();
+            
+            // Stem
+            const stemGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.5, 8);
+            const stemMaterial = new THREE.MeshLambertMaterial({ color: 0xFFF8DC });
+            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+            stem.position.y = 0.25;
+            mushroomGroup.add(stem);
+            
+            // Cap
+            const capGeometry = new THREE.ConeGeometry(0.3, 0.3, 16);
+            const capMaterial = new THREE.MeshLambertMaterial({ color: 0xCD853F });
+            const cap = new THREE.Mesh(capGeometry, capMaterial);
+            cap.position.y = 0.5;
+            mushroomGroup.add(cap);
+            
+            mushroomGroup.position.set(x, 0, z);
+            mushroomGroup.scale.set(0.8, 0.8, 0.8);
+            scene.add(mushroomGroup);
+            
+            return mushroomGroup;
+        }
+        
+        // Add decorative mushrooms around the edge
+        for (let i = 0; i < 12; i++) {
+            const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
+            const radius = 17 + Math.random() * 2;
+            createMushroom(Math.cos(angle) * radius, Math.sin(angle) * radius);
+        }
+        
+        // Create spore particle system
+        const sporeGeometry = new THREE.BufferGeometry();
+        const sporeCount = 200;
+        const positions = new Float32Array(sporeCount * 3);
+        const colors = new Float32Array(sporeCount * 3);
+        
+        for (let i = 0; i < sporeCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 40;
+            positions[i + 1] = Math.random() * 10 - 2;
+            positions[i + 2] = (Math.random() - 0.5) * 40;
+            
+            colors[i] = 1;
+            colors[i + 1] = 0.84;
+            colors[i + 2] = 0;
+        }
+        
+        sporeGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        sporeGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        
+        const sporeMaterial = new THREE.PointsMaterial({
+            size: 0.1,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        
+        const sporeSystem = new THREE.Points(sporeGeometry, sporeMaterial);
+        scene.add(sporeSystem);
+        
+        // Raycaster for mouse interaction
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        
+        // Create enhanced mycelial connection
+        function createMycelialConnection(plant1, plant2) {
+            const connectionGroup = new THREE.Group();
+            
+            // Main connection line
+            const points = [];
+            const start = new THREE.Vector3(plant1.group.position.x, -0.3, plant1.group.position.z);
+            const end = new THREE.Vector3(plant2.group.position.x, -0.3, plant2.group.position.z);
+            
+            // Create curved path underground
+            const mid = start.clone().add(end).multiplyScalar(0.5);
+            mid.y = -0.8 - Math.random() * 0.4;
+            
+            const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+            points.push(...curve.getPoints(30));
+            
+            // Main glowing thread
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({ 
+                color: 0xFFD700,
+                transparent: true,
+                opacity: 0.8,
+                linewidth: 3
+            });
+            
+            const line = new THREE.Line(geometry, material);
+            connectionGroup.add(line);
+            
+            // Add glowing effect with tube geometry
+            const tubeGeometry = new THREE.TubeGeometry(curve, 20, 0.05, 8, false);
+            const tubeMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFFA500,
+                transparent: true,
+                opacity: 0.3,
+                emissive: 0xFFD700,
+                emissiveIntensity: 0.5
+            });
+            const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+            connectionGroup.add(tube);
+            
+            // Add pulsing nodes along the connection
+            const nodeCount = 5;
+            const nodes = [];
+            for (let i = 1; i < nodeCount; i++) {
+                const t = i / nodeCount;
+                const pos = curve.getPoint(t);
+                
+                const nodeGeometry = new THREE.SphereGeometry(0.08, 8, 8);
+                const nodeMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xFFFFFF,
+                    emissive: 0xFFD700,
+                    emissiveIntensity: 1,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const node = new THREE.Mesh(nodeGeometry, nodeMaterial);
+                node.position.copy(pos);
+                connectionGroup.add(node);
+                nodes.push(node);
+            }
+            
+            scene.add(connectionGroup);
+            
+            const connection = {
+                group: connectionGroup,
+                line: line,
+                tube: tube,
+                nodes: nodes,
+                plant1: plant1,
+                plant2: plant2,
+                strength: 0,
+                pulsePhase: Math.random() * Math.PI * 2
+            };
+            
+            mycelialConnections.push(connection);
+            
+            // Add connection to plants
+            plant1.connections.push(plant2);
+            plant2.connections.push(plant1);
+            
+            return connection;
+        }
+        
+        // Update network strength with visual feedback
+        function updateNetworkStrength() {
+            const totalPossibleConnections = (plantCount * (plantCount - 1)) / 2;
+            const strength = totalPossibleConnections > 0 ? 
+                Math.round((mycelialConnections.length / totalPossibleConnections) * 100) : 0;
+            
+            const strengthElement = document.getElementById('network-strength');
+            strengthElement.textContent = `🍄 Network Strength: ${strength}%`;
+            
+            // Update glow intensity based on strength
+            myceliumLight.intensity = 0.3 + (strength / 100) * 0.7;
+            networkBase.material.opacity = 0.1 + (strength / 100) * 0.3;
+            
+            // Color code the strength
+            if (strength < 30) {
+                strengthElement.style.color = '#8B4513';
+            } else if (strength < 60) {
+                strengthElement.style.color = '#DAA520';
+            } else {
+                strengthElement.style.color = '#FFD700';
+            }
+        }
+        
+        // Create a plant
+        function createPlant(x, z, planterName) {
+            const plantType = plantTypes[Math.floor(Math.random() * plantTypes.length)];
+            
+            // Create a group to hold all plant parts
+            const plantGroup = new THREE.Group();
+            
+            // Enhanced root system
+            const rootGroup = new THREE.Group();
+            for (let i = 0; i < 6; i++) {
+                const rootGeometry = new THREE.CylinderGeometry(0.02, 0.08, 1.5, 4);
+                const rootMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xFFD700,
+                    transparent: true,
+                    opacity: 0.6,
+                    emissive: 0xFFA500,
+                    emissiveIntensity: 0.3
+                });
+                const root = new THREE.Mesh(rootGeometry, rootMaterial);
+                const angle = (i / 6) * Math.PI * 2;
+                root.position.set(Math.cos(angle) * 0.3, -0.7, Math.sin(angle) * 0.3);
+                root.rotation.z = Math.random() * 0.3 - 0.15;
+                rootGroup.add(root);
+            }
+            plantGroup.add(rootGroup);
+            
+            // Mycelial glow sphere at root base
+            const glowGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0xFFD700,
+                transparent: true,
+                opacity: 0.2,
+                emissive: 0xFFD700,
+                emissiveIntensity: 0.5
+            });
+            const glowSphere = new THREE.Mesh(glowGeometry, glowMaterial);
+            glowSphere.position.y = -0.5;
+            plantGroup.add(glowSphere);
+            
+            // Stem
+            const stemGeometry = new THREE.CylinderGeometry(0.1, 0.2, 2, 8);
+            const stemMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+            stem.position.set(0, 1, 0);
+            stem.castShadow = true;
+            plantGroup.add(stem);
+            
+            // Flower
+            const flowerGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+            const flowerMaterial = new THREE.MeshLambertMaterial({ color: plantType.color });
+            const flower = new THREE.Mesh(flowerGeometry, flowerMaterial);
+            flower.position.set(0, 2.5, 0);
+            flower.castShadow = true;
+            plantGroup.add(flower);
+            
+            // Add some petals
+            const petals = [];
+            for (let i = 0; i < 6; i++) {
+                const petalGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+                const petal = new THREE.Mesh(petalGeometry, flowerMaterial);
+                const angle = (i / 6) * Math.PI * 2;
+                petal.position.set(
+                    Math.cos(angle) * 0.5,
+                    2.5,
+                    Math.sin(angle) * 0.5
+                );
+                petal.scale.set(1.5, 0.8, 1);
+                plantGroup.add(petal);
+                petals.push(petal);
+            }
+            
+            // Enhanced energy aura
+            const auraGeometry = new THREE.SphereGeometry(3, 32, 32);
+            const auraMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xFFD700,
+                transparent: true,
+                opacity: 0.05,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending
+            });
+            const aura = new THREE.Mesh(auraGeometry, auraMaterial);
+            aura.position.set(0, 1, 0);
+            plantGroup.add(aura);
+            
+            // Position the entire group
+            plantGroup.position.set(x, 0, z);
+            scene.add(plantGroup);
+            
+            // Store plant data
+            const plantData = {
+                group: plantGroup,
+                stem: stem,
+                flower: flower,
+                petals: petals,
+                roots: rootGroup,
+                glowSphere: glowSphere,
+                aura: aura,
+                x: x,
+                z: z,
+                type: plantType,
+                planterName: planterName,
+                plantedAt: new Date().toLocaleString(),
+                connections: []
+            };
+            
+            plants.push(plantData);
+            
+            // Connect to nearby plants
+            plants.forEach(otherPlant => {
+                if (otherPlant !== plantData) {
+                    const distance = Math.sqrt(
+                        Math.pow(otherPlant.x - x, 2) + 
+                        Math.pow(otherPlant.z - z, 2)
+                    );
+                    if (distance < 8) { // Increased connection range
+                        createMycelialConnection(plantData, otherPlant);
+                    }
+                }
+            });
+            
+            updateNetworkStrength();
+            
+            // Animate plant growth
+            stem.scale.y = 0;
+            flower.scale.set(0, 0, 0);
+            rootGroup.scale.set(0, 0, 0);
+            glowSphere.scale.set(0, 0, 0);
+            aura.scale.set(0, 0, 0);
+            petals.forEach(petal => petal.scale.set(0, 0, 0));
+            
+            const growAnimation = setInterval(() => {
+                if (stem.scale.y < 1) {
+                    stem.scale.y += 0.05;
+                    stem.position.y = stem.scale.y;
+                    rootGroup.scale.set(
+                        rootGroup.scale.x + 0.05,
+                        rootGroup.scale.y + 0.05,
+                        rootGroup.scale.z + 0.05
+                    );
+                    glowSphere.scale.set(
+                        glowSphere.scale.x + 0.05,
+                        glowSphere.scale.y + 0.05,
+                        glowSphere.scale.z + 0.05
+                    );
+                }
+                if (flower.scale.x < 1) {
+                    flower.scale.set(
+                        flower.scale.x + 0.05,
+                        flower.scale.y + 0.05,
+                        flower.scale.z + 0.05
+                    );
+                    petals.forEach(petal => {
+                        petal.scale.set(
+                            Math.min(1.5, petal.scale.x + 0.075),
+                            Math.min(0.8, petal.scale.y + 0.04),
+                            Math.min(1, petal.scale.z + 0.05)
+                        );
+                    });
+                    aura.scale.set(
+                        aura.scale.x + 0.1,
+                        aura.scale.y + 0.1,
+                        aura.scale.z + 0.1
+                    );
+                } else {
+                    clearInterval(growAnimation);
+                }
+            }, 50);
+            
+            // Create growing spores
+            createGrowingSpores(x, z);
+            
+            return plantData;
+        }
+        
+        // Create spore burst when planting
+        function createGrowingSpores(x, z) {
+            for (let i = 0; i < 20; i++) {
+                const sporeGeometry = new THREE.SphereGeometry(0.05, 4, 4);
+                const sporeMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xFFD700,
+                    transparent: true,
+                    opacity: 0.8,
+                    emissive: 0xFFD700,
+                    emissiveIntensity: 1
+                });
+                const spore = new THREE.Mesh(sporeGeometry, sporeMaterial);
+                
+                spore.position.set(
+                    x + (Math.random() - 0.5) * 2,
+                    Math.random() * 2,
+                    z + (Math.random() - 0.5) * 2
+                );
+                
+                spore.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.1,
+                    Math.random() * 0.1 + 0.05,
+                    (Math.random() - 0.5) * 0.1
+                );
+                
+                scene.add(spore);
+                sporeParticles.push(spore);
+                
+                // Fade out spore
+                setTimeout(() => {
+                    const fadeInterval = setInterval(() => {
+                        spore.material.opacity -= 0.05;
+                        if (spore.material.opacity <= 0) {
+                            scene.remove(spore);
+                            sporeParticles.splice(sporeParticles.indexOf(spore), 1);
+                            clearInterval(fadeInterval);
+                        }
+                    }, 50);
+                }, 1000);
+            }
+        }
+        
+        // Mouse events
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            
+            // Check if hovering over ground
+            const groundIntersects = raycaster.intersectObject(ground);
+            if (groundIntersects.length > 0) {
+                const point = groundIntersects[0].point;
+                if (Math.sqrt(point.x * point.x + point.z * point.z) < 17) {
+                    // Change cursor to watering can when over plantable area
+                    document.body.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g transform="translate(20,20)"><ellipse cx="0" cy="0" rx="10" ry="8" fill="%2387CEEB" opacity="0.9"/><rect x="8" y="-4" width="6" height="3" fill="%23696969" rx="1"/><path d="M 14,-3 Q 16,-6 16,-8 L 18,-8 Q 18,-5 16,-2" fill="%23696969"/><circle cx="0" cy="0" r="1" fill="%234169E1" opacity="0.8"/><circle cx="-3" cy="-2" r="0.8" fill="%234169E1" opacity="0.7"/><circle cx="3" cy="-2" r="0.8" fill="%234169E1" opacity="0.7"/><circle cx="0" cy="3" r="0.6" fill="%234169E1" opacity="0.6"/><circle cx="16" cy="-10" r="0.5" fill="%2300BFFF"/><circle cx="17" cy="-12" r="0.4" fill="%2300BFFF"/><circle cx="15" cy="-12" r="0.4" fill="%2300BFFF"/></g></svg>') 20 20, crosshair`;
+                } else {
+                    document.body.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><g transform="translate(20,20)"><ellipse cx="0" cy="2" rx="8" ry="4" fill="%23CD853F" opacity="0.9"/><ellipse cx="0" cy="2" rx="6" ry="3" fill="%23DEB887" opacity="0.9"/><rect x="-2" y="2" width="4" height="6" fill="%23FFF8DC" rx="1"/><circle cx="0" cy="1" r="1.5" fill="%23FFD700" opacity="0.8"/><circle cx="-3" cy="0" r="1" fill="%23FF69B4" opacity="0.7"/><circle cx="3" cy="0" r="1" fill="%23FF69B4" opacity="0.7"/><path d="M 0,-8 Q -2,-4 0,0 Q 2,-4 0,-8" fill="%2390EE90" opacity="0.8"/><circle cx="0" cy="-8" r="2" fill="%2332CD32" opacity="0.9"/></g></svg>') 20 20, auto`;
+                }
+            }
+            
+            // Check for plant hover
+            const plantMeshes = plants.map(p => p.flower);
+            const intersects = raycaster.intersectObjects(plantMeshes);
+            
+            const plantInfo = document.getElementById('plant-info');
+            
+            if (intersects.length > 0) {
+                const hoveredFlower = intersects[0].object;
+                const plant = plants.find(p => p.flower === hoveredFlower);
+                
+                // Change cursor to magnifying glass when over plants
+                document.body.style.cursor = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><g transform="translate(18,18)"><circle cx="-2" cy="-2" r="8" fill="none" stroke="%23708090" stroke-width="2"/><circle cx="-2" cy="-2" r="7" fill="%2387CEEB" opacity="0.3"/><line x1="4" y1="4" x2="10" y2="10" stroke="%23708090" stroke-width="3" stroke-linecap="round"/><circle cx="-4" cy="-4" r="1" fill="%23FFF" opacity="0.8"/><path d="M -2,-2 L 0,0" stroke="%234169E1" stroke-width="1" opacity="0.6"/></g></svg>') 18 18, help`;
+                
+                if (plant) {
+                    plantInfo.innerHTML = `
+                        <div style="font-size: 24px; margin-bottom: 8px;">${plant.type.emoji}</div>
+                        <strong>${plant.type.name}</strong><br>
+                        Planted by: ${plant.planterName}<br>
+                        <small>${plant.plantedAt}</small>
+                        <div class="connection-count">🍄 Connected to ${plant.connections.length} plants</div>
+                    `;
+                    plantInfo.style.display = 'block';
+                    plantInfo.style.left = event.clientX + 'px';
+                    plantInfo.style.top = (event.clientY - 100) + 'px';
+                    
+                    // Highlight connections dramatically
+                    plant.connections.forEach(connected => {
+                        connected.aura.material.opacity = 0.3;
+                        connected.glowSphere.material.opacity = 0.5;
+                    });
+                    plant.aura.material.opacity = 0.4;
+                    plant.glowSphere.material.opacity = 0.6;
+                }
+            } else {
+                plantInfo.style.display = 'none';
+                // Reset aura opacity
+                plants.forEach(p => {
+                    p.aura.material.opacity = 0.05;
+                    p.glowSphere.material.opacity = 0.2;
+                });
+            }
+        }
+        
+        function onMouseClick(event) {
+            if (plantCount >= maxPlants) return;
+            
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(ground);
+            
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                
+                // Check if position is valid (not too close to other plants)
+                const tooClose = plants.some(p => {
+                    const distance = Math.sqrt(
+                        Math.pow(p.group.position.x - point.x, 2) + 
+                        Math.pow(p.group.position.z - point.z, 2)
+                    );
+                    return distance < 1.5;
+                });
+                
+                if (!tooClose && Math.sqrt(point.x * point.x + point.z * point.z) < 17) {
+                    const planterName = planterNames[Math.floor(Math.random() * planterNames.length)];
+                    createPlant(point.x, point.z, planterName);
+                    plantCount++;
+                    updateCounter();
+                    
+                    // Play planting sound effect
+                    playPlantSound();
+                    
+                    // Pulse network when new plant added
+                    pulseNetwork();
+                    
+                    if (plantCount >= maxPlants) {
+                        showBlossom();
+                    }
+                }
+            }
+        }
+        
+        // Pulse network connections dramatically
+        function pulseNetwork() {
+            mycelialConnections.forEach((connection, index) => {
+                setTimeout(() => {
+                    let pulseStrength = 0;
+                    const pulseAnimation = setInterval(() => {
+                        pulseStrength += 0.1;
+                        if (pulseStrength > 1) {
+                            pulseStrength = 0;
+                            clearInterval(pulseAnimation);
+                        }
+                        connection.line.material.opacity = 0.4 + pulseStrength * 0.6;
+                        connection.tube.material.opacity = 0.2 + pulseStrength * 0.5;
+                        connection.nodes.forEach(node => {
+                            node.scale.setScalar(1 + pulseStrength * 0.5);
+                            node.material.opacity = 0.5 + pulseStrength * 0.5;
+                        });
+                    }, 30);
+                }, index * 50);
+            });
+        }
+        
+        // Update plant counter
+        function updateCounter() {
+            document.getElementById('plant-counter').textContent = `🌱 Plants: ${plantCount} / ${maxPlants}`;
+        }
+        
+        // Show blossom animation
+        function showBlossom() {
+            const overlay = document.getElementById('blossom-overlay');
+            const message = document.getElementById('blossom-message').querySelector('p');
+            
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.background = 'rgba(0, 0, 0, 0.7)';
+                document.getElementById('blossom-message').style.opacity = '1';
+                message.textContent = messages[Math.floor(Math.random() * messages.length)];
+                
+                // Create multiple blossom animations
+                for (let i = 0; i < 5; i++) {
+                    createBlossomSVG(i);
+                }
+                
+                playBlossomSound();
+            }, 100);
+            
+            // Reset after animation
+            setTimeout(() => {
+                resetGarden();
+                overlay.style.background = 'rgba(0, 0, 0, 0)';
+                document.getElementById('blossom-message').style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 2000);
+            }, 6000);
+        }
+        
+        // Create SVG blossom
+        function createBlossomSVG(index) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('class', 'blossom-svg');
+            svg.style.left = Math.random() * window.innerWidth + 'px';
+            svg.style.top = Math.random() * window.innerHeight + 'px';
+            svg.style.animationDelay = index * 0.3 + 's';
+            
+            const flower = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            
+            // Create petals
+            for (let i = 0; i < 8; i++) {
+                const petal = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                petal.setAttribute('cx', '200');
+                petal.setAttribute('cy', '200');
+                petal.setAttribute('rx', '80');
+                petal.setAttribute('ry', '30');
+                petal.setAttribute('fill', `hsl(${Math.random() * 60 + 300}, 70%, 70%)`);
+                petal.setAttribute('opacity', '0.8');
+                petal.setAttribute('transform', `rotate(${i * 45} 200 200) translate(0 -50)`);
+                flower.appendChild(petal);
+            }
+            
+            // Center circle
+            const center = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            center.setAttribute('cx', '200');
+            center.setAttribute('cy', '200');
+            center.setAttribute('r', '40');
+            center.setAttribute('fill', '#FFD700');
+            flower.appendChild(center);
+            
+            svg.appendChild(flower);
+            document.getElementById('blossom-overlay').appendChild(svg);
+            
+            setTimeout(() => svg.remove(), 4000);
+        }
+        
+        // Reset garden
+        function resetGarden() {
+            plants.forEach(plant => {
+                scene.remove(plant.group);
+            });
+            mycelialConnections.forEach(connection => {
+                scene.remove(connection.group);
+            });
+            sporeParticles.forEach(spore => {
+                scene.remove(spore);
+            });
+            plants.length = 0;
+            mycelialConnections.length = 0;
+            sporeParticles.length = 0;
+            plantCount = 0;
+            updateCounter();
+            updateNetworkStrength();
+        }
+        
+        // Audio functions
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playPlantSound() {
+            if (!audioEnabled) return;
+            
+            // Play a cute ascending arpeggio
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            
+            notes.forEach((note, index) => {
+                setTimeout(() => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.type = 'sine';
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(note, audioContext.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.2 - index * 0.03, audioContext.currentTime + 0.02);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                }, index * 50);
+            });
+        }
+        
+        function playBlossomSound() {
+            if (!audioEnabled) return;
+            
+            // Play a magical, celebratory melody
+            const melody = [
+                { note: 523.25, time: 0 },    // C5
+                { note: 523.25, time: 100 },  // C5
+                { note: 587.33, time: 200 },  // D5
+                { note: 659.25, time: 300 },  // E5
+                { note: 783.99, time: 400 },  // G5
+                { note: 659.25, time: 500 },  // E5
+                { note: 783.99, time: 600 },  // G5
+                { note: 880.00, time: 700 },  // A5
+                { note: 1046.50, time: 800 }, // C6
+                { note: 1046.50, time: 900 }, // C6
+                { note: 1046.50, time: 1000 } // C6
+            ];
+            
+            melody.forEach(({ note, time }) => {
+                setTimeout(() => {
+                    // Main note
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    const filter = audioContext.createBiquadFilter();
+                    
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(note, audioContext.currentTime);
+                    
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(2000, audioContext.currentTime);
+                    filter.Q.setValueAtTime(5, audioContext.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+                    
+                    oscillator.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 1);
+                    
+                    // Add sparkle effect with higher harmonics
+                    const sparkle = audioContext.createOscillator();
+                    const sparkleGain = audioContext.createGain();
+                    
+                    sparkle.type = 'sine';
+                    sparkle.frequency.setValueAtTime(note * 4, audioContext.currentTime);
+                    sparkleGain.gain.setValueAtTime(0.05, audioContext.currentTime);
+                    sparkleGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+                    
+                    sparkle.connect(sparkleGain);
+                    sparkleGain.connect(audioContext.destination);
+                    
+                    sparkle.start(audioContext.currentTime);
+                    sparkle.stop(audioContext.currentTime + 0.5);
+                }, time);
+            });
+        }
+        
+        // Background music
+        function createBackgroundMusic() {
+            // Create a more complex and pleasant background music
+            const notes = [
+                { freq: 261.63, duration: 0.5 }, // C4
+                { freq: 329.63, duration: 0.5 }, // E4
+                { freq: 392.00, duration: 0.5 }, // G4
+                { freq: 329.63, duration: 0.5 }, // E4
+                { freq: 261.63, duration: 0.5 }, // C4
+                { freq: 329.63, duration: 0.5 }, // E4
+                { freq: 392.00, duration: 0.5 }, // G4
+                { freq: 523.25, duration: 1.0 }, // C5
+                
+                { freq: 293.66, duration: 0.5 }, // D4
+                { freq: 349.23, duration: 0.5 }, // F4
+                { freq: 440.00, duration: 0.5 }, // A4
+                { freq: 349.23, duration: 0.5 }, // F4
+                { freq: 293.66, duration: 0.5 }, // D4
+                { freq: 349.23, duration: 0.5 }, // F4
+                { freq: 440.00, duration: 0.5 }, // A4
+                { freq: 587.33, duration: 1.0 }, // D5
+            ];
+            
+            let noteIndex = 0;
+            let nextNoteTime = audioContext.currentTime;
+            
+            // Main melody
+            function playMelody() {
+                if (!audioEnabled) return;
+                
+                const note = notes[noteIndex];
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const filter = audioContext.createBiquadFilter();
+                
+                // Use a softer waveform
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(note.freq, nextNoteTime);
+                
+                // Add a gentle filter for warmth
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(2000, nextNoteTime);
+                filter.Q.setValueAtTime(1, nextNoteTime);
+                
+                // Create envelope for each note
+                gainNode.gain.setValueAtTime(0, nextNoteTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, nextNoteTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.05, nextNoteTime + note.duration * 0.8);
+                gainNode.gain.linearRampToValueAtTime(0, nextNoteTime + note.duration);
+                
+                // Connect the audio graph
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.start(nextNoteTime);
+                oscillator.stop(nextNoteTime + note.duration);
+                
+                // Add harmony
+                const harmonyOsc = audioContext.createOscillator();
+                const harmonyGain = audioContext.createGain();
+                harmonyOsc.type = 'triangle';
+                harmonyOsc.frequency.setValueAtTime(note.freq * 0.5, nextNoteTime); // Lower octave
+                harmonyGain.gain.setValueAtTime(0.03, nextNoteTime);
+                harmonyGain.gain.linearRampToValueAtTime(0, nextNoteTime + note.duration);
+                
+                harmonyOsc.connect(harmonyGain);
+                harmonyGain.connect(audioContext.destination);
+                harmonyOsc.start(nextNoteTime);
+                harmonyOsc.stop(nextNoteTime + note.duration);
+                
+                // Add some bell-like overtones
+                const bellOsc = audioContext.createOscillator();
+                const bellGain = audioContext.createGain();
+                bellOsc.type = 'sine';
+                bellOsc.frequency.setValueAtTime(note.freq * 3, nextNoteTime); // 3rd harmonic
+                bellGain.gain.setValueAtTime(0.02, nextNoteTime);
+                bellGain.gain.exponentialRampToValueAtTime(0.001, nextNoteTime + 0.3);
+                
+                bellOsc.connect(bellGain);
+                bellGain.connect(audioContext.destination);
+                bellOsc.start(nextNoteTime);
+                bellOsc.stop(nextNoteTime + 0.3);
+                
+                // Schedule next note
+                noteIndex = (noteIndex + 1) % notes.length;
+                nextNoteTime += note.duration;
+            }
+            
+            // Create ambient pad
+            const padOsc1 = audioContext.createOscillator();
+            const padOsc2 = audioContext.createOscillator();
+            const padGain = audioContext.createGain();
+            const padFilter = audioContext.createBiquadFilter();
+            
+            padOsc1.type = 'sine';
+            padOsc2.type = 'sine';
+            padOsc1.frequency.value = 130.81; // C3
+            padOsc2.frequency.value = 196.00; // G3
+            
+            padFilter.type = 'lowpass';
+            padFilter.frequency.value = 800;
+            padFilter.Q.value = 2;
+            
+            padGain.gain.value = 0.03;
+            
+            // Add subtle vibrato to pad
+            const vibrato = audioContext.createOscillator();
+            const vibratoGain = audioContext.createGain();
+            vibrato.frequency.value = 4;
+            vibratoGain.gain.value = 2;
+            
+            vibrato.connect(vibratoGain);
+            vibratoGain.connect(padOsc1.frequency);
+            vibratoGain.connect(padOsc2.frequency);
+            
+            padOsc1.connect(padFilter);
+            padOsc2.connect(padFilter);
+            padFilter.connect(padGain);
+            padGain.connect(audioContext.destination);
+            
+            padOsc1.start();
+            padOsc2.start();
+            vibrato.start();
+            
+            // Schedule melody playback
+            const melodyInterval = setInterval(() => {
+                if (audioEnabled && audioContext.currentTime >= nextNoteTime - 0.1) {
+                    playMelody();
+                }
+            }, 50);
+            
+            return {
+                stop: () => {
+                    clearInterval(melodyInterval);
+                    padOsc1.stop();
+                    padOsc2.stop();
+                    vibrato.stop();
+                }
+            };
+        }
+        
+        let backgroundMusic = null;
+        
+        // Toggle audio
+        document.getElementById('audio-toggle').addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            document.getElementById('audio-toggle').textContent = `🎵 Music: ${audioEnabled ? 'ON' : 'OFF'}`;
+            
+            if (audioEnabled && !backgroundMusic) {
+                backgroundMusic = createBackgroundMusic();
+            } else if (!audioEnabled && backgroundMusic) {
+                backgroundMusic.stop();
+                backgroundMusic = null;
+            }
+        });
+        
+        // Toggle mycelium view
+        document.getElementById('mycelial-toggle').addEventListener('click', () => {
+            showMycelium = !showMycelium;
+            const button = document.getElementById('mycelial-toggle');
+            button.textContent = `🍄 Mycelium: ${showMycelium ? 'ON' : 'OFF'}`;
+            button.classList.toggle('active', showMycelium);
+            
+            // Toggle visibility of underground elements with animation
+            underground.visible = showMycelium;
+            networkBase.visible = showMycelium;
+            mycelialConnections.forEach(connection => {
+                connection.group.visible = showMycelium;
+            });
+            plants.forEach(plant => {
+                plant.roots.visible = showMycelium;
+                plant.glowSphere.visible = showMycelium;
+            });
+            sporeSystem.visible = showMycelium;
+            myceliumLight.visible = showMycelium;
+        });
+        
+        // Event listeners
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('click', onMouseClick);
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Update network pulse
+            networkPulse += 0.02;
+            
+            // Rotate plants gently
+            plants.forEach((plant, index) => {
+                plant.group.rotation.y = Math.sin(Date.now() * 0.001 + index) * 0.1;
+                
+                // Pulse aura based on connections
+                const connectionStrength = plant.connections.length / plants.length;
+                plant.aura.material.opacity = 0.05 + Math.sin(networkPulse + index) * 0.03 * connectionStrength;
+                
+                // Pulse root glow
+                if (plant.glowSphere.visible) {
+                    plant.glowSphere.material.opacity = 0.2 + Math.sin(networkPulse * 2 + index) * 0.1;
+                }
+            });
+            
+            // Animate mycelial connections with flowing energy
+            mycelialConnections.forEach((connection, index) => {
+                const pulse = Math.sin(networkPulse * 2 + connection.pulsePhase) * 0.5 + 0.5;
+                
+                if (connection.group.visible) {
+                    connection.line.material.opacity = 0.6 + pulse * 0.4;
+                    connection.tube.material.opacity = 0.3 + pulse * 0.3;
+                    
+                    // Animate nodes flowing along connection
+                    connection.nodes.forEach((node, nodeIndex) => {
+                        const nodePulse = Math.sin(networkPulse * 3 + nodeIndex * 0.5 + connection.pulsePhase) * 0.5 + 0.5;
+                        node.scale.setScalar(0.8 + nodePulse * 0.4);
+                        node.material.opacity = 0.5 + nodePulse * 0.5;
+                        node.material.emissiveIntensity = 0.5 + nodePulse * 0.5;
+                    });
+                }
+            });
+            
+            // Animate spore system
+            const positions = sporeSystem.geometry.attributes.position.array;
+            for (let i = 0; i < positions.length; i += 3) {
+                positions[i + 1] += Math.sin(networkPulse + i) * 0.005;
+                if (positions[i + 1] > 10) positions[i + 1] = -2;
+                if (positions[i + 1] < -2) positions[i + 1] = 10;
+            }
+            sporeSystem.geometry.attributes.position.needsUpdate = true;
+            
+            // Animate individual spore particles
+            sporeParticles.forEach(spore => {
+                spore.position.add(spore.velocity);
+                spore.velocity.y -= 0.001; // gravity
+            });
+            
+            // Pulse network base glow
+            if (networkBase.visible) {
+                networkBase.material.opacity = 0.1 + Math.sin(networkPulse) * 0.05 + 
+                    (mycelialConnections.length / 100) * 0.2;
+            }
+            
+            // Camera slight movement
+            camera.position.x = Math.sin(Date.now() * 0.0001) * 2;
+            camera.position.y = 15 + Math.sin(Date.now() * 0.0002) * 1;
+            camera.lookAt(0, 0, 0);
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // Initialize background music
+        setTimeout(() => {
+            if (audioEnabled) {
+                backgroundMusic = createBackgroundMusic();
+            }
+        }, 1000);
+        
+        // Note about WebRTC
+        console.log('Note: This garden embodies Mycelial Creativity through interconnected networks.');
+        console.log('Each plant connects to others, sharing resources and strengthening the whole network.');
+    </script>
+</body>
+</html>
